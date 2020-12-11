@@ -1,6 +1,6 @@
 let socket = io();
 
-let params = new URLSearchParams(window.location.search);
+//let params = new URLSearchParams(window.location.search);
 
 if (!params.has("nombre") || !params.has("sala")) {
   window.location = "index.html";
@@ -12,42 +12,42 @@ let usuario = {
   sala: params.get("sala"),
 };
 
-//Detectar conexion de usuario
-socket.on("connect", () => {
-  socket.emit("entrarChat", usuario, (resp) => {
-    console.log("Usuarios Conectados", resp);
+socket.on("connect", function () {
+  console.log("Conectado al servidor");
+
+  socket.emit("entrarChat", usuario, function (resp) {
+    console.log("Usuarios conectados", resp);
+    renderizarUsuarios(resp);
   });
 });
 
 // escuchar
-socket.on("disconnect", () => {
+socket.on("disconnect", function () {
   console.log("Perdimos conexión con el servidor");
 });
 
 // Enviar información
-// socket.emit(
-//   "crearMensaje",
-//   {
-//     usuario: "Jean",
-//     mensaje: "Hola Mundo",
-//   },
-//   function (resp) {
-//     console.log("respuesta server: ", resp);
-//   }
-// );
+// socket.emit('crearMensaje', {
+//     nombre: 'Fernando',
+//     mensaje: 'Hola Mundo'
+// }, function(resp) {
+//     console.log('respuesta server: ', resp);
+// });
 
 // Escuchar información
-socket.on("crearMensaje", (mensaje) => {
-  console.log("Servidor:", mensaje);
+socket.on("crearMensaje", function (mensaje) {
+  //console.log("Servidor:", mensaje);
+  renderizarMensajes(mensaje, false);
+  scrollBottom();
 });
 
-//Escuchar cambios de usuarios cuando un usuario entra o sale del chat
-socket.on("listaPersonas", (personas) => {
-  console.log(personas);
+// Escuchar cambios de usuarios
+// cuando un usuario entra o sale del chat
+socket.on("listaPersonas", function (personas) {
+  renderizarUsuarios(personas);
 });
 
-//Mensajes privados
-
-socket.on("mensajePrivado", (mensaje) => {
-  console.log("Mensaje privado:", mensaje);
+// Mensajes privados
+socket.on("mensajePrivado", function (mensaje) {
+  console.log("Mensaje Privado:", mensaje);
 });
